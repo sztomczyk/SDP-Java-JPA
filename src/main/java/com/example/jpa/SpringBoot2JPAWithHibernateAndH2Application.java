@@ -7,13 +7,23 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @SpringBootApplication
 public class SpringBoot2JPAWithHibernateAndH2Application implements CommandLineRunner {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    StudentRepository repository;
+    StudentRepository studentRepository;
+
+    @Autowired
+    EmployeeRepository employeeRepository;
+
+    @Autowired
+    TaskRepository taskRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBoot2JPAWithHibernateAndH2Application.class, args);
@@ -21,22 +31,33 @@ public class SpringBoot2JPAWithHibernateAndH2Application implements CommandLineR
 
     @Override
     public void run(String... args) throws Exception {
+        logger.info("Inserting -> {}", studentRepository.save(new Student("Szymon", "E1234567")));
+        logger.info("Inserting -> {}", studentRepository.save(new Student("Adrian", "A1234568")));
+        logger.info("Inserting -> {}", studentRepository.save(new Student("Maciej", "C1233124")));
 
-        logger.info("Student id 10001 -> {}", repository.findById(10001L));
+        Set<Task> emp1Tasks = new HashSet<>();
+        emp1Tasks.add(new Task("Wycentrować div horyzontalnie i wertykalnie"));
+        emp1Tasks.add(new Task("Stworzyć raport z poprzedniego zadania"));
+        emp1Tasks.add(new Task("ISSUE #A3B3F"));
 
-        logger.info("All users 1 -> {}", repository.findAll());
+        Set<Task> emp2Tasks = new HashSet<>();
+        emp2Tasks.add(new Task("Przeprowadzić prezentację o nowym feature"));
+        emp2Tasks.add(new Task("Spotkanie z klientem o 13:15"));
 
-        // Insert
-        logger.info("Inserting -> {}", repository.save(new Student("John", "A1234657")));
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(new Task("Task 1"));
+        tasks.add(new Task("Task 2"));
 
-        // Update
-        logger.info("Update 10001 -> {}", repository.save(new Student(10001L, "Name-Updated", "New-Passport")));
+        Employee emp1 = new Employee("Michał", 350000, emp1Tasks);
+        Employee emp2 = new Employee("Szymon", 1000000, emp2Tasks);
 
-        repository.deleteById(10002L);
+        logger.info("Inserting -> {}", employeeRepository.save(emp1));
+        logger.info("Inserting -> {}", employeeRepository.save(emp2));
+        logger.info("Inserting -> {}", employeeRepository.save(new Employee("Mikołaj", 500000)));
 
-        logger.info("All users 2 -> {}", repository.findAll());
-
-        logger.info("Find by name -> {}", repository.findByName("John"));
-
+        employeeRepository.delete(emp1);
+        emp2.setName("Szymon2");
+        emp2.setSalary(1500000);
+        employeeRepository.save(emp2);
     }
 }
